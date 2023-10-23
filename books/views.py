@@ -3,8 +3,10 @@ from .models import Book, Category
 from .serializers import BookSerializer, CategorySerializer
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.parsers import MultiPartParser, FormParser
 from accounts.permissions import IsLibrarian
-
+from rest_framework.response import Response
+from rest_framework.status import HTTP_201_CREATED
 
 class CategoriesCreateAPIView(CreateAPIView):
     queryset = Category.objects.all()
@@ -28,7 +30,7 @@ class BooksCreateAPIView(CreateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticated, IsLibrarian]
-
+    parser_classes = (MultiPartParser, FormParser)
     def create(self, request, *args, **kwargs):
         serializer = BookSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -37,6 +39,9 @@ class BooksCreateAPIView(CreateAPIView):
             isPossibleToOrder = False
 
         serializer.save()
+
+        return Response({'message': 'Book created successfully'},
+                        status=HTTP_201_CREATED)
 
 
 class BooksListAPIView(ListAPIView):
