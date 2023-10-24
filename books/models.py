@@ -2,6 +2,8 @@ from django.db import models
 from main.settings import IMAGE_FOLDER, MEDIA_ROOT
 from rest_framework.exceptions import ValidationError
 
+def upload_to(instance, filename):
+    return 'images/{filename}'.format(filename=filename)
 
 class Category(models.Model):
     title = models.CharField(max_length=150)
@@ -18,7 +20,7 @@ class Book(models.Model):
     author = models.CharField(max_length=150)
     title = models.CharField(max_length=150)
     description = models.TextField(default="", blank=True)
-    image = models.ImageField(default=MEDIA_ROOT+"error_404/Error404img.png", upload_to=IMAGE_FOLDER)
+    image = models.ImageField(default=MEDIA_ROOT+"error_404/Error404img.png", upload_to=upload_to)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     quantity = models.IntegerField()
     isPossibleToOrder = models.BooleanField(default=True)

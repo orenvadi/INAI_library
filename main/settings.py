@@ -161,11 +161,32 @@ USE_I18N = True
 USE_TZ = True
 
 
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': False,
+    'JSON_EDITOR': True,
+    'SHOW_REQUEST_HEADERS': True,
+}
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
-MEDIA_ROOT = "media/"
+
+
+
+#  MEDIA_ROOT = "media/"
+# Actual directory user files go to
+
+# URL used to access the media
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+MEDIA_URL = '/media/'
+
 IMAGE_FOLDER = MEDIA_ROOT + "books/"
 STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'staticfiles_build')]
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
