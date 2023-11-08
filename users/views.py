@@ -1,12 +1,15 @@
-from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.generics import (CreateAPIView, ListAPIView,
+                                     RetrieveUpdateDestroyAPIView)
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
-from rest_framework.status import HTTP_201_CREATED, HTTP_200_OK, HTTP_400_BAD_REQUEST
+from rest_framework.response import Response
+from rest_framework.status import (HTTP_200_OK, HTTP_201_CREATED,
+                                   HTTP_400_BAD_REQUEST)
 from rest_framework.views import APIView
-from .permissions import NotStudentPermission
-from .serializers import UserSerializer, LoginSerializer
-from .models import User
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from .models import Group, User
+from .permissions import IsAdmin, NotStudentPermission
+from .serializers import GroupSerializer, LoginSerializer, UserSerializer
 
 
 class UserRegisterAPIView(CreateAPIView):
@@ -17,9 +20,10 @@ class UserRegisterAPIView(CreateAPIView):
     def post(self, request, *args, **kwargs):
         data = request.data
 
-        if not data["phone"][1:].isdigit() \
-                or not 8 < len(data["phone"]) < 14:
-            return Response({"message": "Неверный номер телефона"}, status=HTTP_400_BAD_REQUEST)
+        if not data["phone"][1:].isdigit() or not 8 < len(data["phone"]) < 14:
+            return Response(
+                {"message": "Неверный номер телефона"}, status=HTTP_400_BAD_REQUEST
+            )
 
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
@@ -31,11 +35,11 @@ class UserRegisterAPIView(CreateAPIView):
 
         return Response(
             {
-                'message': 'User registered successfully',
-                'access_token': access_token,
-                'refresh_token': refresh_token
+                "message": "User registered successfully",
+                "access_token": access_token,
+                "refresh_token": refresh_token,
             },
-            status=HTTP_201_CREATED
+            status=HTTP_201_CREATED,
         )
 
 
@@ -50,12 +54,13 @@ class UserLoginAPIView(APIView):
         email = data.get("email")
         password = data.get("password")
         user = User.objects.filter(email=email).first()
+        serializer = UserSerializer(user)
 
         if user is None:
-            return Response({'message': 'User not found'}, status=400)
+            return Response({"message": "User not found"}, status=400)
 
         if not user.check_password(password):
-            return Response({'message': 'Invalid password'}, status=400)
+            return Response({"message": "Invalid password"}, status=400)
 
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
@@ -63,28 +68,36 @@ class UserLoginAPIView(APIView):
 
         return Response(
             {
-                'message': 'User logged in successfully',
-                'access_token': access_token,
-                'refresh_token': refresh_token
+                "message": "User logged in successfully",
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "user": serializer.data,
             },
-            status=HTTP_200_OK
+            status=HTTP_200_OK,
         )
 
 
 class UserLogoutAPIView(APIView):
-
     @classmethod
     def post(cls, request):
-        refresh_token = request.data.get('refresh_token')
+        refresh_token = request.data.get("refresh_token")
 
         if not refresh_token:
-            return Response({'message': "Отсутствует Refresh токен"}, status=HTTP_400_BAD_REQUEST)
+            return Response(
+                {"message": "Отсутствует Refresh токен"}, status=HTTP_400_BAD_REQUEST
+            )
 
         try:
             RefreshToken(refresh_token).blacklist()
-            return Response({'message': 'Пользователь успещно вышел из системы.'}, status=HTTP_200_OK)
+            return Response(
+                {"message": "Пользователь успещно вышел из системы."},
+                status=HTTP_200_OK,
+            )
         except Exception:
-            return Response({'message': 'Неверный токен или токен просрочен.'}, status=HTTP_400_BAD_REQUEST)
+            return Response(
+                {"message": "Неверный токен или токен просрочен."},
+                status=HTTP_400_BAD_REQUEST,
+            )
 
 
 class UserListAPIView(ListAPIView):
@@ -102,3 +115,13 @@ class UserGetAPIView(APIView):
         serialized_user = UserSerializer(user)
         return Response(serialized_user.data)
 
+
+class GroupCreateAPIView(CreateAPIView):
+    serializer_class = GroupSerializer
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+
+class GroupChangeAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+    permission_classes = [IsAuthenticated, IsAdmin]
