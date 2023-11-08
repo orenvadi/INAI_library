@@ -28,6 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    "orenvadi.pythonanywhere.com",
     "192.168.45.234",
     "127.0.0.1",
     "192.168.108.191",
@@ -35,8 +36,11 @@ ALLOWED_HOSTS = [
     "192.168.108.234",
     "192.168.88.71",
 ]
-
-CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "https://inai-library.netlify.app/",
+    "https://libr2.vercel.app/",
+]
 
 
 # Application definition
