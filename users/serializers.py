@@ -1,6 +1,5 @@
 from rest_framework import serializers
-
-from .models import Group, User
+from .models import User, Group
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -9,25 +8,17 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = (
-            "email",
-            "first_name",
-            "last_name",
-            "password",
-            "phone",
-            "status",
-            "group",
-        )
+        fields = ("email", "first_name", "last_name", "password", "phone", "status", "group")
 
     def create(self, validated_data):
         user = User(
-            email=validated_data["email"],
-            first_name=validated_data["first_name"],
-            last_name=validated_data["last_name"],
-            phone=validated_data["phone"],
-            group=validated_data["group"],
+            email=validated_data['email'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+            phone=validated_data['phone'],
+            group=validated_data['group']
         )
-        user.set_password(validated_data["password"])
+        user.set_password(validated_data['password'])
         user.save()
         return user
 

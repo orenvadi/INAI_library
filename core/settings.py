@@ -38,8 +38,8 @@ ALLOWED_HOSTS = [
 ]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://inai-library.netlify.app/",
-    "https://libr2.vercel.app/",
+    "https://inai-library.netlify.app",
+    "https://libr2.vercel.app",
 ]
 
 
