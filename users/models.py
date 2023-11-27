@@ -58,27 +58,29 @@ class User(AbstractUser):
     email = models.EmailField(unique=True, null=True)
     phone = models.CharField(max_length=150, default="", blank=True, validators=[validate_phone])
     status = models.CharField(max_length=150, choices=USER_STATUS, default=USER_STATUS[2][0])
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, default="")
     date_joined = None
-
+    last_login = None
+    groups = None
+    user_permissions = None
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
-    groups = models.ManyToManyField(
-        'auth.Group',
-        related_name='custom_users',
-        blank=True,
-        help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.',
-        verbose_name='groups',
-    )
-
-    user_permissions = models.ManyToManyField(
-        'auth.Permission',
-        related_name='custom_users',
-        blank=True,
-        help_text='Specific permissions for this user.',
-        verbose_name='user permissions',
-    )
+    # groups = models.ManyToManyField(
+    #     'auth.Group',
+    #     related_name='custom_users',
+    #     blank=True,
+    #     help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.',
+    #     verbose_name='groups',
+    # )
+    #
+    # user_permissions = models.ManyToManyField(
+    #     'auth.Permission',
+    #     related_name='custom_users',
+    #     blank=True,
+    #     help_text='Specific permissions for this user.',
+    #     verbose_name='user permissions',
+    # )
 
     class Meta:
         db_table = "users"
